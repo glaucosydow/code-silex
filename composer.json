@@ -1,0 +1,15 @@
+{
+    "config" : {
+        "bin-dir" : "bin/"
+    },
+
+    "require" : {
+        "silex/silex": "~1.2"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "CODE" : "src/"
+        }
+    }
+}
