@@ -13,7 +13,7 @@ $app->get('/', function () {
 });
 
 //Cria a rota /clientes
-$app->get('/clientes', function () {
+$app->get('/clientes', function () use ($app) {
 
     $arrayClientes = [
         ['nome'=>'João Antônio', 'email'=>'joao@email.com', 'cpf'=>'111.222.333-44'],
@@ -22,7 +22,7 @@ $app->get('/clientes', function () {
         ['nome'=>'Maria Tavares', 'email'=>'maria@email.com', 'cpf'=>'999.333.777-55'],
     ];
 
-    return json_encode($arrayClientes);
+    return $app->json($arrayClientes);
 });
 
 
