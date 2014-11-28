@@ -4,11 +4,27 @@
 require_once __DIR__ . "/../bootstrap.php";
 
 
+$app['produtoFixture'] = function(){
+    $con = new \Code\Sistema\DB\Connection();
+    return new \Code\Sistema\Fixtures\Fixtures($con->get());
+};
+
+$app['produtoService'] = function() use ($app){
+    $con = new \Code\Sistema\DB\Connection();
+
+    $app['produtoFixture']->init();
+
+    $produtoEntity = new \Code\Sistema\Entity\Produto();
+    $produtoMapper = new \Code\Sistema\Mapper\ProdutoMapper($con->get());
+
+    return new \Code\Sistema\Service\ProdutoService($produtoEntity, $produtoMapper);
+};
+
 
 //Cria rota para a index
 $app->get('/', function () {
 
-    return "Acesse /clientes";
+    return "Acesse /produtos";
 
 });
 
@@ -23,6 +39,24 @@ $app->get('/clientes', function () use ($app) {
     ];
 
     return $app->json($arrayClientes);
+});
+
+
+//Cria a rota /produtos
+$app->get('/produtos', function () use ($app) {
+
+    $dados['nome'] = "Televisão 50 polegadas";
+    $dados['descricao'] = "Com conversor digital, Full HD, Modo Futebol";
+    $dados['valor'] = 1599.90;
+
+    $result = $app['produtoService']->insert($dados);
+    if($result){
+        $produtos = $app['produtoService']->findAll();
+        $app['produtoFixture']->end();
+        return $app->json($produtos);
+    }
+
+    return false;
 });
 
 

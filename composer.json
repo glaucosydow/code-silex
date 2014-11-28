@@ -8,8 +8,8 @@
     },
 
     "autoload": {
-        "psr-0": {
-            "CODE" : "src/"
+        "psr-4": {
+            "Code\\Sistema\\" : "src/Code/Sistema/"
         }
     }
 }
