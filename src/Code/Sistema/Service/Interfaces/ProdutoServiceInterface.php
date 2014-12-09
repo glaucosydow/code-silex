@@ -15,4 +15,8 @@ interface ProdutoServiceInterface
 {
     public function __construct(ProdutoInterface $produto, MapperInterface $mapper);
     public function insert(array $data);
+    public function update(array $data);
+    public function delete($id);
+    public function findAll();
+    public function findById($id);
 } 

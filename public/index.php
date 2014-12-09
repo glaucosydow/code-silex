@@ -3,6 +3,8 @@
 //Inclui o arquivo de configuração
 require_once __DIR__ . "/../bootstrap.php";
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 $app['produtoFixture'] = function(){
     $con = new \Code\Sistema\DB\Connection();
@@ -22,43 +24,92 @@ $app['produtoService'] = function() use ($app){
 
 
 //Cria rota para a index
-$app->get('/', function () {
+$app->get('/', function () use ($app) {
 
-    return "Acesse /produtos";
+    return $app['twig']->render('home/index.twig', array(
 
-});
+    ));
 
-//Cria a rota /clientes
-$app->get('/clientes', function () use ($app) {
+})->bind('home');
 
-    $arrayClientes = [
-        ['nome'=>'João Antônio', 'email'=>'joao@email.com', 'cpf'=>'111.222.333-44'],
-        ['nome'=>'Rafael Santos', 'email'=>'rafael@email.com', 'cpf'=>'222.333.444-55'],
-        ['nome'=>'Angela Maria', 'email'=>'angela@email.com', 'cpf'=>'444.333.444-55'],
-        ['nome'=>'Maria Tavares', 'email'=>'maria@email.com', 'cpf'=>'999.333.777-55'],
-    ];
-
-    return $app->json($arrayClientes);
-});
 
 
 //Cria a rota /produtos
 $app->get('/produtos', function () use ($app) {
 
-    $dados['nome'] = "Televisão 50 polegadas";
-    $dados['descricao'] = "Com conversor digital, Full HD, Modo Futebol";
-    $dados['valor'] = 1599.90;
+    $produtos = $app['produtoService']->findAll();
+    return $app['twig']->render('produtos/index.twig', array(
+        'produtos' => $produtos
+    ));
+})->bind('produtos');
 
-    $result = $app['produtoService']->insert($dados);
-    if($result){
-        $produtos = $app['produtoService']->findAll();
-        $app['produtoFixture']->end();
-        return $app->json($produtos);
+//Cria a rota /produtos/novo
+$app->get('/produtos/novo', function () use ($app) {
+    return $app['twig']->render('produtos/novo.twig', array(
+
+    ));
+})->bind('novo-produto');
+
+//Cria a rota /produtos/novo
+$app->get('/produtos/editar/{id}', function ($id) use ($app) {
+    return $app['twig']->render('produtos/editar.twig', array(
+        'produto' => $app['produtoService']->findById($id),
+    ));
+})->bind('editar-produto');
+
+//Cria a rota /produtos/novo
+$app->get('/produtos/remover/{id}', function ($id) use ($app) {
+    return $app['twig']->render('produtos/remover.twig', array(
+        'produto' => $app['produtoService']->findById($id),
+    ));
+})->bind('remover-produto');
+
+
+
+//Cria a rota de cadastro
+$app->post('/produtos/cadastrar', function(Request $request) use ($app){
+
+    $data = iterator_to_array($request->request->getIterator());
+    if($app['produtoService']->insert($data)){
+        $app['session']->getFlashBag()->add('messageSuccess', 'Cadastro efetuado com sucesso.');
+        return $app->redirect('/produtos');
     }
 
-    return false;
-});
+    $app['session']->getFlashBag()->add('messageFail', 'Houve um erro ao cadastrar.');
+    return $app->redirect('/produtos');
+
+})->bind('cadastrar-produto');
+
+//Cria a rota de edição
+$app->put('/produtos/alterar', function(Request $request) use ($app){
+
+    $data = iterator_to_array($request->request->getIterator());
+    if($app['produtoService']->update($data)){
+        $app['session']->getFlashBag()->add('messageSuccess', 'Cadastro alterado com sucesso.');
+        return $app->redirect('/produtos');
+    }
+
+    $app['session']->getFlashBag()->add('messageFail', 'Houve um erro ao alterar o registro.');
+    return $app->redirect('/produtos');
+
+})->bind('alterar-cadastro-produto');
+
+//Cria a rota de remocção
+$app->delete('/produtos/delete', function(Request $request) use ($app){
+
+    $data = iterator_to_array($request->request->getIterator());
+    if($app['produtoService']->delete($data['id'])){
+        $app['session']->getFlashBag()->add('messageSuccess', 'Cadastro removido com sucesso.');
+        return $app->redirect('/produtos');
+    }
+
+    $app['session']->getFlashBag()->add('messageFail', 'Houve um erro ao remover o registro.');
+    return $app->redirect('/produtos');
+
+})->bind('remover-cadastro-produto');
 
 
+
+Request::enableHttpMethodParameterOverride();
 //Roda a aplicação
 $app->run();

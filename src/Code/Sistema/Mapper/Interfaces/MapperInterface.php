@@ -14,5 +14,8 @@ interface MapperInterface
 {
     public function __construct(\PDO $pdo);
     public function insert(ProdutoInterface $produto);
+    public function update(ProdutoInterface $produto);
+    public function delete(ProdutoInterface $produto);
     public function findAll();
-} 
+    public function findById($id);
+}

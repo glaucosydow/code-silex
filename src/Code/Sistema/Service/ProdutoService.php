@@ -34,9 +34,33 @@ class ProdutoService implements ProdutoServiceInterface
             return $this->mapper->insert($produtoEntity);
         }
 
+        public function update(array $data)
+        {
+            $produtoEntity = $this->produto;
+            $produtoEntity->setId($data['id']);
+            $produtoEntity->setNome($data['nome']);
+            $produtoEntity->setDescricao($data['descricao']);
+            $produtoEntity->setValor($data['valor']);
+
+            return $this->mapper->update($produtoEntity);
+        }
+
+        public function delete($id)
+        {
+            $produtoEntity = $this->produto;
+            $produtoEntity->setId($id);
+
+            return $this->mapper->delete($produtoEntity);
+        }
+
         public function findAll()
         {
             return $this->mapper->findAll();
+        }
+
+        public function findById($id)
+        {
+            return $this->mapper->findById($id);
         }
 
 } 
