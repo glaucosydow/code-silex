@@ -6,6 +6,8 @@ require_once __DIR__ . "/../bootstrap.php";
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 $app['produtoFixture'] = function(){
     $con = new \Code\Sistema\DB\Connection();
     return new \Code\Sistema\Fixtures\Fixtures($con->get());
@@ -21,6 +23,74 @@ $app['produtoService'] = function() use ($app){
 
     return new \Code\Sistema\Service\ProdutoService($produtoEntity, $produtoMapper);
 };
+
+
+/************ROTAS DA API**************/
+
+$app->get('/api/produtos/', function () use ($app) {
+    $produtos = $app['produtoService']->findAll();
+    return $app->json($produtos);
+});
+
+$app->get('/api/produtos/{id}', function ($id) use ($app) {
+    $produto = $app['produtoService']->findById($id);
+    return $app->json($produto);
+});
+
+$app->post('/api/produtos/insert', function(Request $request) use ($app){
+    $data['nome'] = $request->request->get('nome');
+    $data['descricao'] = $request->request->get('descricao');
+    $data['valor'] = $request->request->get('valor');
+
+    if($app['produtoService']->insert($data)){
+        return $app->json(['success'=>true, 'messages' => ['Inserido com sucesso']]);
+    }
+
+    $errors = [
+        'success' => false,
+        'messages' => [
+            'Não foi possível efetuar o cadastro',
+        ],
+    ];
+    return $app->json($errors);
+});
+
+$app->put('/api/produtos/update/{id}', function($id, Request $request) use ($app){
+    $data['id'] = $id;
+    $data['nome'] = $request->request->get('nome');
+    $data['descricao'] = $request->request->get('descricao');
+    $data['valor'] = $request->request->get('valor');
+
+    if($app['produtoService']->update($data)){
+        return $app->json(['success'=>true, 'messages' => ['Alterado com sucesso']]);
+    }
+
+    $errors = [
+        'success' => false,
+        'messages' => [
+            'Não foi possível alterar o cadastro',
+        ],
+    ];
+    return $app->json($errors);
+});
+
+$app->delete('/api/produtos/delete/{id}', function($id) use ($app){
+
+    if($app['produtoService']->delete($id)){
+        return $app->json(['success'=>true, 'messages' => ['Removido com sucesso']]);
+    }
+
+    $errors = [
+        'success' => false,
+        'messages' => [
+            'Não foi possível remover o cadastro',
+        ],
+    ];
+    return $app->json($errors);
+});
+
+/**********FIM ROTAS DA API************/
+
 
 
 //Cria rota para a index

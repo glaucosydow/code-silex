@@ -26,31 +26,28 @@ class ProdutoService implements ProdutoServiceInterface
 
         public function insert(array $data)
         {
-            $produtoEntity = $this->produto;
-            $produtoEntity->setNome($data['nome']);
-            $produtoEntity->setDescricao($data['descricao']);
-            $produtoEntity->setValor($data['valor']);
+            $this->produto->setNome($data['nome']);
+            $this->produto->setDescricao($data['descricao']);
+            $this->produto->setValor($data['valor']);
 
-            return $this->mapper->insert($produtoEntity);
+            return $this->mapper->insert($this->produto);
         }
 
         public function update(array $data)
         {
-            $produtoEntity = $this->produto;
-            $produtoEntity->setId($data['id']);
-            $produtoEntity->setNome($data['nome']);
-            $produtoEntity->setDescricao($data['descricao']);
-            $produtoEntity->setValor($data['valor']);
+            $this->produto->setId($data['id']);
+            $this->produto->setNome($data['nome']);
+            $this->produto->setDescricao($data['descricao']);
+            $this->produto->setValor($data['valor']);
 
-            return $this->mapper->update($produtoEntity);
+            return $this->mapper->update($this->produto);
         }
 
         public function delete($id)
         {
-            $produtoEntity = $this->produto;
-            $produtoEntity->setId($id);
+            $this->produto->setId($id);
 
-            return $this->mapper->delete($produtoEntity);
+            return $this->mapper->delete($this->produto);
         }
 
         public function findAll()
